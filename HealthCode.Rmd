@@ -1,0 +1,71 @@
+---
+title: "Eating and Health"
+author: "The Seekers: Sowmith Kistipati, kistipatis@mail.sacredheart.edu/ Sai Hrithik Peddi, peddis4@mail.sacredheart.edu/ Vamsi Kiran Kakkera, kakkeras@mail.sacredheart.edu"
+date: "2022-11-28"
+output: html_document
+---
+
+<p style="font-family: calibri, serif; font-size:11pt; font-style:italic">
+
+![Eating and Health Module.](Eating-and-Health.jpeg)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Description
+
+Predicting BMI:
+
+The Health and Eating Habits of American Citizens is a set of data that was produced by the Bureau of Labor Statistics of the United States of America. We are going to determine whether or not we are able to predict BMI (body mass index, which is intended to be an approximate estimate of body fat) based on height, weight, the amount of time spent exercising by each individual, and the amount of time spent eating by each individual.
+
+```{r warning=FALSE}
+# libraries we'll need
+library(car) # for avplots
+library(tidyverse) # for general utility functions
+
+# read in our data 
+bmi_data <- read_csv("C:\\Users\\Sowmith Reddy\\Downloads\\ehresp_2014\\ehresp_2014.csv") %>%
+    filter(erbmi > 0) # remove rows where the reported BMI is less than 0 (impossible)
+```
+
+```{r warning=FALSE}
+# fit a glm model
+model <- glm(erbmi ~ euexfreq + euwgt + euhgt + ertpreat, # formula
+             data = bmi_data, # dataset
+             family = ("gaussian")) # fit a linear model
+```
+
+##Data Visualization
+
+Let's look at some diagnostic graphs after we've finished fitting our model to the data. Because I'm using the plot() function, the plots we end up with will be very, very slightly different than the plots we would receive if we used the glm.diag.plots() function that comes with the boot package.
+
+```{r warning=FALSE}
+# output plots in a 2 x 2 grid 
+par(mfrow = c(2,2)) 
+# diagnostic plots
+plot(model)
+```
+
+##Data Examinig
+
+```{r warning=FALSE}
+summary(model)
+```
+
+##Data Regression
+
+We can determine from our model that the average BMI isn't 0 because the intercept is far from 0 and the standard error is tiny (less than 10% of the estimate). We can also tell that weight (euwgt) and height (euhgt) are definitely essential, but neither how often someone exercises (euexfreq) nor how much time they spend eating (ertpreat) seem to be particularly useful.
+
+
+
+```{r warning=FALSE}
+# added-variable plots for our model
+avPlots(model)
+```
+
+##Conclusion
+
+In the upper right corner of these plots, we can see that as euwgt (weight) grows, so does erbmi (BMI, the variable we're attempting to forecast). Observing the bottom left corner, we can see that erbmi drops as euhgt (height) grows. Therefore, both height and weight are crucial, yet they have opposing effects! This is also evident from the summary of our model, since euwgt had a positive estimate whereas euhgt had a negative estimate.
+
+The other two plots demonstrate that there is no significant association between those variables and the one we're attempting to forecast, which we've previously determined from our model
